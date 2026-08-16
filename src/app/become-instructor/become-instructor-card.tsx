@@ -1,12 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CopyApplicationButton } from "./copy-application-button";
 import { GraduationCap, BookOpen, ClipboardCheck, Users, Mail } from "lucide-react";
 
 export function BecomeInstructorCard({ name, email }: { name: string; email: string }) {
+  const applicationText = `Hi Wisekew team,\n\nI'd like to apply to become an instructor on Wisekew.\n\nName: ${name}\nAccount email: ${email}\nWhat I'd like to teach: \n\nThanks!`;
   const subject = encodeURIComponent("Instructor application - Wisekew");
-  const body = encodeURIComponent(
-    `Hi Wisekew team,\n\nI'd like to apply to become an instructor on Wisekew.\n\nName: ${name}\nAccount email: ${email}\nWhat I'd like to teach: \n\nThanks!`,
-  );
+  const body = encodeURIComponent(applicationText);
   const mailtoHref = `mailto:info@wisekew.com?subject=${subject}&body=${body}`;
 
   return (
@@ -40,6 +40,23 @@ export function BecomeInstructorCard({ name, email }: { name: string; email: str
           <Mail className="h-4 w-4" />
           Email us to apply
         </Button>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Nothing happened? Your browser may not have a default email app set up.
+        </p>
+        <CopyApplicationButton text={applicationText} />
+
+        <p className="mt-6 text-left text-xs font-medium text-muted-foreground">
+          Or copy this manually and paste it into an email to{" "}
+          <a href="mailto:info@wisekew.com" className="font-semibold text-primary hover:underline">
+            info@wisekew.com
+          </a>
+        </p>
+        <textarea
+          readOnly
+          value={applicationText}
+          rows={6}
+          className="mt-2 w-full resize-none rounded-lg border border-input bg-muted/30 p-3 text-left text-xs text-foreground"
+        />
       </CardContent>
     </Card>
   );
