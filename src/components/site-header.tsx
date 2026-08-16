@@ -49,7 +49,7 @@ export async function SiteHeader() {
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <NavDropdown label="Courses" links={courseLinks} />
-          <NavDropdown label="Teach" links={teachLinks} />
+          {user?.role !== "STUDENT" && <NavDropdown label="Teach" links={teachLinks} />}
           {user?.role === "STUDENT" && (
             <Link href="/dashboard" className="text-foreground/70 hover:text-primary transition-colors">
               My Learning
