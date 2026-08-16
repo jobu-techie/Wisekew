@@ -1,19 +1,18 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Award, GraduationCap, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Award, GraduationCap, ArrowRight, PlayCircle, MonitorPlay } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (session!.user.role === "ADMIN") redirect("/admin");
-  if (session!.user.role === "INSTRUCTOR") redirect("/instructor");
   const userId = session!.user.id;
+  const firstName = session!.user.name?.split(" ")[0] ?? "there";
 
   const enrollments = await prisma.enrollment.findMany({
     where: { userId },
@@ -45,9 +44,64 @@ export default async function DashboardPage() {
     take: 10,
   });
 
+  const mostRecentEnrollment = enrollments[0];
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="mb-6 text-3xl font-bold tracking-tight">My Learning</h1>
+    <div>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight">Welcome, {firstName}!</h1>
+
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Card className="rounded-2xl border-black/10 dark:border-white/10">
+          <CardContent className="py-6">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <PlayCircle className="h-5 w-5" />
+            </span>
+            <h3 className="font-semibold">
+              {mostRecentEnrollment ? "Continue learning" : "Browse courses"}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {mostRecentEnrollment
+                ? `Pick up where you left off in ${mostRecentEnrollment.course.title}.`
+                : "Find a course or exam-prep program to get started."}
+            </p>
+            <Button
+              size="sm"
+              className="mt-4 rounded-md"
+              render={
+                <Link
+                  href={
+                    mostRecentEnrollment
+                      ? `/courses/${mostRecentEnrollment.course.slug}/learn`
+                      : "/courses"
+                  }
+                />
+              }
+            >
+              {mostRecentEnrollment ? "Continue" : "Browse courses"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-black/10 dark:border-white/10">
+          <CardContent className="py-6">
+            <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <MonitorPlay className="h-5 w-5" />
+            </span>
+            <h3 className="font-semibold">Try a free demo</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Preview a lecture from any course before you enroll.
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-4 rounded-md"
+              render={<Link href="/dashboard/free-demos" />}
+            >
+              Access free demos
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
 
       {session!.user.role === "STUDENT" && (
         <Link href="/become-instructor">

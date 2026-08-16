@@ -15,22 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const COUNTRIES = [
-  "Kenya",
-  "United States",
-  "United Kingdom",
-  "Canada",
-  "Australia",
-  "Nigeria",
-  "South Africa",
-  "Uganda",
-  "Tanzania",
-  "Rwanda",
-  "India",
-  "United Arab Emirates",
-  "Other",
-];
+import { COUNTRIES } from "@/lib/countries";
 
 export function SignupForm() {
   const [state, formAction, isPending] = useActionState<SignupState, FormData>(
