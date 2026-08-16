@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, UserCircle, CreditCard } from "lucide-react";
+import { ChevronRight, UserCircle, CreditCard, Ticket, RefreshCw } from "lucide-react";
 
-export function AccountMenuContent({ basePath }: { basePath: string }) {
+export function AccountMenuContent({
+  basePath,
+  role,
+}: {
+  basePath: string;
+  role: "student" | "instructor";
+}) {
   const links = [
     {
       href: `${basePath}/account/information`,
@@ -16,6 +22,22 @@ export function AccountMenuContent({ basePath }: { basePath: string }) {
       title: "Purchase History",
       description: "View details of your order history.",
     },
+    ...(role === "student"
+      ? [
+          {
+            href: `${basePath}/account/redeem`,
+            icon: Ticket,
+            title: "Redeem Access Code",
+            description: "Have an access code? Enter it below to unlock a course.",
+          },
+          {
+            href: `${basePath}/account/updates`,
+            icon: RefreshCw,
+            title: "Course Updates",
+            description: "See what's changed in the courses you're enrolled in.",
+          },
+        ]
+      : []),
   ];
 
   return (

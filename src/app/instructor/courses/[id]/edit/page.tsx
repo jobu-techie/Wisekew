@@ -3,10 +3,12 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EditCourseForm } from "./edit-course-form";
 import { PublishToggle } from "./publish-toggle";
 import { SectionManager } from "./section-manager";
+import { GenerateCodeButton } from "./generate-code-button";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +27,10 @@ export default async function EditCoursePage({
       sections: {
         orderBy: { order: "asc" },
         include: { lectures: { orderBy: { order: "asc" } } },
+      },
+      accessCodes: {
+        include: { redeemedBy: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
       },
     },
   });
@@ -61,12 +67,48 @@ export default async function EditCoursePage({
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-black/10 dark:border-white/10">
+      <Card className="mb-8 rounded-2xl border-black/10 dark:border-white/10">
         <CardHeader>
           <CardTitle className="text-lg">Curriculum</CardTitle>
         </CardHeader>
         <CardContent>
           <SectionManager courseId={course.id} sections={course.sections} />
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl border-black/10 dark:border-white/10">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle className="text-lg">Access codes</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Generate a free code to give someone access to this course.
+            </p>
+          </div>
+          <GenerateCodeButton courseId={course.id} />
+        </CardHeader>
+        <CardContent>
+          {course.accessCodes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No access codes yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {course.accessCodes.map((code) => (
+                <li
+                  key={code.id}
+                  className="flex items-center justify-between rounded border p-3 text-sm"
+                >
+                  <span className="font-mono">{code.code}</span>
+                  {code.redeemedAt ? (
+                    <Badge variant="secondary">
+                      Redeemed by {code.redeemedBy?.name} ·{" "}
+                      {code.redeemedAt.toLocaleDateString()}
+                    </Badge>
+                  ) : (
+                    <Badge>Unredeemed</Badge>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
     </div>

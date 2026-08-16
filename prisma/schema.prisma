@@ -32,12 +32,13 @@ model User {
   role         Role     @default(STUDENT)
   createdAt    DateTime @default(now())
 
-  coursesTaught    Course[]          @relation("InstructorCourses")
-  enrollments      Enrollment[]
-  payments         Payment[]
-  examAttempts     ExamAttempt[]
-  lectureProgress  LectureProgress[]
-  certificates     Certificate[]
+  coursesTaught       Course[]          @relation("InstructorCourses")
+  enrollments         Enrollment[]
+  payments            Payment[]
+  examAttempts        ExamAttempt[]
+  lectureProgress     LectureProgress[]
+  certificates        Certificate[]
+  redeemedAccessCodes AccessCode[]
 }
 
 model Course {
@@ -60,6 +61,7 @@ model Course {
   enrollments   Enrollment[]
   payments      Payment[]
   certificates  Certificate[]
+  accessCodes   AccessCode[]
 }
 
 model Section {
@@ -165,6 +167,18 @@ model LectureProgress {
   lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lectureId])
+}
+
+model AccessCode {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  courseId     String
+  redeemedById String?
+  redeemedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  course     Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  redeemedBy User?  @relation(fields: [redeemedById], references: [id])
 }
 
 model Certificate {
