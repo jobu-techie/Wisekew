@@ -1,0 +1,177 @@
+// Prisma schema for Wisekew — course marketplace + exam-prep platform
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum PaymentStatus {
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  createdAt    DateTime @default(now())
+
+  coursesTaught    Course[]          @relation("InstructorCourses")
+  enrollments      Enrollment[]
+  payments         Payment[]
+  examAttempts     ExamAttempt[]
+  lectureProgress  LectureProgress[]
+  certificates     Certificate[]
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  description  String
+  category     String
+  price        Decimal  @db.Decimal(10, 2)
+  thumbnailUrl String?
+  published    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  instructorId String
+  instructor   User @relation("InstructorCourses", fields: [instructorId], references: [id])
+
+  sections      Section[]
+  questionBanks QuestionBank[]
+  enrollments   Enrollment[]
+  payments      Payment[]
+  certificates  Certificate[]
+}
+
+model Section {
+  id       String @id @default(cuid())
+  courseId String
+  title    String
+  order    Int
+
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lectures Lecture[]
+}
+
+model Lecture {
+  id        String  @id @default(cuid())
+  sectionId String
+  title     String
+  videoUrl  String?
+  content   String?
+  duration  Int? // seconds
+  order     Int
+
+  section  Section           @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress LectureProgress[]
+}
+
+model QuestionBank {
+  id       String @id @default(cuid())
+  courseId String
+  title    String
+
+  course    Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions Question[]
+  exams     Exam[]
+}
+
+model Question {
+  id             String @id @default(cuid())
+  bankId         String
+  text           String
+  choices        Json // string[]
+  correctChoice  Int // index into choices
+  explanation    String?
+
+  bank QuestionBank @relation(fields: [bankId], references: [id], onDelete: Cascade)
+}
+
+model Exam {
+  id               String @id @default(cuid())
+  bankId           String
+  title            String
+  numQuestions     Int
+  timeLimitMinutes Int
+
+  bank     QuestionBank  @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  attempts ExamAttempt[]
+}
+
+model ExamAttempt {
+  id          String    @id @default(cuid())
+  examId      String
+  userId      String
+  answers     Json // { [questionId]: choiceIndex }
+  score       Float?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  enrolledAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String
+  courseId  String
+  amount    Decimal       @db.Decimal(10, 2)
+  provider  String // "MOCK" for now, "STRIPE" later
+  status    PaymentStatus @default(COMPLETED)
+  createdAt DateTime      @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model LectureProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lectureId   String
+  completedAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lectureId])
+}
+
+model Certificate {
+  id       String   @id @default(cuid())
+  userId   String
+  courseId String
+  issuedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
