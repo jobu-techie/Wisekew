@@ -2,6 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth, signIn } from "@/auth";
 
@@ -69,13 +70,15 @@ export async function signupAction(
   return {};
 }
 
-export async function becomeInstructorAction() {
+export async function promoteToInstructorAction(userId: string) {
   const session = await auth();
-  if (!session?.user) throw new Error("Not authenticated");
-  if (session.user.role !== "STUDENT") return;
+  if (session?.user.role !== "ADMIN") throw new Error("Not authorized");
 
   await prisma.user.update({
-    where: { id: session.user.id },
+    where: { id: userId },
     data: { role: "INSTRUCTOR" },
   });
+
+  revalidatePath(`/admin/users/${userId}`);
+  revalidatePath("/admin");
 }

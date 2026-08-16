@@ -10,7 +10,7 @@ export default async function BecomeInstructorPage() {
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md items-center px-4">
-      <BecomeInstructorCard name={session.user.name ?? "there"} />
+      <BecomeInstructorCard name={session.user.name ?? "there"} email={session.user.email ?? ""} />
     </div>
   );
 }

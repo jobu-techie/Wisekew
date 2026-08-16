@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
+import { PromoteToInstructorButton } from "./promote-to-instructor-button";
 import {
   ArrowLeft,
   Award,
@@ -111,6 +112,7 @@ export default async function AdminUserDetailPage({
             Joined {user.createdAt.toLocaleDateString()}
           </p>
         </div>
+        {user.role === "STUDENT" && <PromoteToInstructorButton userId={user.id} />}
       </div>
 
       {user.coursesTaught.length > 0 && (

@@ -1,31 +1,13 @@
-"use client";
-
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { becomeInstructorAction } from "@/lib/actions/auth";
-import { GraduationCap, BookOpen, ClipboardCheck, Users } from "lucide-react";
+import { GraduationCap, BookOpen, ClipboardCheck, Users, Mail } from "lucide-react";
 
-export function BecomeInstructorCard({ name }: { name: string }) {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const { update } = useSession();
-  const router = useRouter();
-
-  function handleBecomeInstructor() {
-    setError(null);
-    startTransition(async () => {
-      try {
-        await becomeInstructorAction();
-        await update({ role: "INSTRUCTOR" });
-        router.push("/instructor");
-      } catch {
-        setError("Something went wrong. Please try again.");
-      }
-    });
-  }
+export function BecomeInstructorCard({ name, email }: { name: string; email: string }) {
+  const subject = encodeURIComponent("Instructor application - Wisekew");
+  const body = encodeURIComponent(
+    `Hi Wisekew team,\n\nI'd like to apply to become an instructor on Wisekew.\n\nName: ${name}\nAccount email: ${email}\nWhat I'd like to teach: \n\nThanks!`,
+  );
+  const mailtoHref = `mailto:info@wisekew.com?subject=${subject}&body=${body}`;
 
   return (
     <Card className="w-full rounded-2xl border-black/10 dark:border-white/10">
@@ -35,8 +17,8 @@ export function BecomeInstructorCard({ name }: { name: string }) {
         </span>
         <h1 className="text-2xl font-bold tracking-tight">Become an instructor</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Hey {name}, you already have a Wisekew account. Upgrade it to start
-          teaching — you&apos;ll keep your learning progress and certificates.
+          Hey {name}, want to teach on Wisekew? Send our team a quick email and
+          we&apos;ll set up your instructor account for you.
         </p>
 
         <div className="mt-6 space-y-3 text-left text-sm">
@@ -54,15 +36,9 @@ export function BecomeInstructorCard({ name }: { name: string }) {
           </div>
         </div>
 
-        {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
-
-        <Button
-          size="lg"
-          className="mt-8 w-full rounded-md"
-          disabled={isPending}
-          onClick={handleBecomeInstructor}
-        >
-          {isPending ? "Upgrading account..." : "Become an instructor"}
+        <Button size="lg" className="mt-8 w-full gap-2 rounded-md" render={<a href={mailtoHref} />}>
+          <Mail className="h-4 w-4" />
+          Email us to apply
         </Button>
       </CardContent>
     </Card>
