@@ -50,9 +50,14 @@ export async function SiteHeader() {
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <NavDropdown label="Courses" links={courseLinks} />
           <NavDropdown label="Teach" links={teachLinks} />
-          {user && user.role !== "ADMIN" && (
+          {user?.role === "STUDENT" && (
             <Link href="/dashboard" className="text-foreground/70 hover:text-primary transition-colors">
               My Learning
+            </Link>
+          )}
+          {user?.role === "INSTRUCTOR" && (
+            <Link href="/instructor" className="text-foreground/70 hover:text-primary transition-colors">
+              Dashboard
             </Link>
           )}
           {user?.role === "ADMIN" && (
