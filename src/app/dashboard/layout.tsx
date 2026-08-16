@@ -8,7 +8,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (session!.user.role === "INSTRUCTOR") redirect("/instructor");
 
   return (
-    <PortalShell label="Student Portal" basePath="/dashboard" userName={session!.user.name!}>
+    <PortalShell
+      label="Student Portal"
+      basePath="/dashboard"
+      role="student"
+      userName={session!.user.name!}
+    >
       {children}
     </PortalShell>
   );

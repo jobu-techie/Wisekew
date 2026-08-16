@@ -1,7 +1,7 @@
-import { NotificationsContent } from "@/components/portal/notifications-content";
+import { InstructorNotificationsContent } from "@/components/portal/instructor-notifications-content";
 
 export const dynamic = "force-dynamic";
 
 export default function NotificationsPage() {
-  return <NotificationsContent />;
+  return <InstructorNotificationsContent />;
 }

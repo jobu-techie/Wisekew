@@ -4,17 +4,19 @@ import { PortalSidebar } from "./portal-sidebar";
 export function PortalShell({
   label,
   basePath,
+  role,
   userName,
   children,
 }: {
   label: string;
   basePath: string;
+  role: "student" | "instructor";
   userName: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <PortalSidebar basePath={basePath} />
+      <PortalSidebar basePath={basePath} role={role} />
 
       <div className="sm:pl-56">
         <div className="border-b border-black/5 bg-slate-100 dark:border-white/10 dark:bg-muted/20">

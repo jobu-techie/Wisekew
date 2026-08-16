@@ -5,7 +5,12 @@ export default async function InstructorLayout({ children }: { children: React.R
   const session = await auth();
 
   return (
-    <PortalShell label="Instructor Portal" basePath="/instructor" userName={session!.user.name!}>
+    <PortalShell
+      label="Instructor Portal"
+      basePath="/instructor"
+      role="instructor"
+      userName={session!.user.name!}
+    >
       {children}
     </PortalShell>
   );

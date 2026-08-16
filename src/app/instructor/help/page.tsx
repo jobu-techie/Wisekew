@@ -1,5 +1,5 @@
-import { HelpContent } from "@/components/portal/help-content";
+import { InstructorHelpContent } from "@/components/portal/instructor-help-content";
 
 export default function HelpPage() {
-  return <HelpContent />;
+  return <InstructorHelpContent />;
 }

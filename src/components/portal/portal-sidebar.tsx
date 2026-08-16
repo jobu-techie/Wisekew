@@ -2,19 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Bell, MonitorPlay, UserCircle, HelpCircle } from "lucide-react";
+import {
+  LayoutDashboard,
+  Bell,
+  MonitorPlay,
+  UserCircle,
+  HelpCircle,
+  PlusCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function PortalSidebar({ basePath }: { basePath: string }) {
+export function PortalSidebar({
+  basePath,
+  role,
+}: {
+  basePath: string;
+  role: "student" | "instructor";
+}) {
   const pathname = usePathname();
 
-  const navItems = [
-    { href: basePath, label: "Dashboard", icon: LayoutDashboard },
-    { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
-    { href: `${basePath}/free-demos`, label: "Free Demos", icon: MonitorPlay },
-    { href: `${basePath}/account`, label: "Account", icon: UserCircle },
-    { href: `${basePath}/help`, label: "Help", icon: HelpCircle },
-  ];
+  const navItems =
+    role === "instructor"
+      ? [
+          { href: basePath, label: "Dashboard", icon: LayoutDashboard },
+          { href: `${basePath}/courses/new`, label: "New Course", icon: PlusCircle },
+          { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
+          { href: `${basePath}/account`, label: "Account", icon: UserCircle },
+          { href: `${basePath}/help`, label: "Help", icon: HelpCircle },
+        ]
+      : [
+          { href: basePath, label: "Dashboard", icon: LayoutDashboard },
+          { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
+          { href: `${basePath}/free-demos`, label: "Free Demos", icon: MonitorPlay },
+          { href: `${basePath}/account`, label: "Account", icon: UserCircle },
+          { href: `${basePath}/help`, label: "Help", icon: HelpCircle },
+        ];
 
   return (
     <aside className="fixed top-18 bottom-0 left-0 z-30 hidden w-56 overflow-y-auto bg-stone-900 px-4 py-6 sm:block">
