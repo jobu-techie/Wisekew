@@ -99,6 +99,14 @@ export default async function AdminUserDetailPage({
             <Badge variant={roleBadgeVariant[user.role]}>{user.role}</Badge>
           </div>
           <p className="mt-1 text-muted-foreground">{user.email}</p>
+          {user.phone && (
+            <p className="mt-1 text-sm text-muted-foreground">{user.phone}</p>
+          )}
+          {(user.country || user.postalCode) && (
+            <p className="mt-1 text-sm text-muted-foreground">
+              {[user.country, user.postalCode].filter(Boolean).join(" · ")}
+            </p>
+          )}
           <p className="mt-1 text-sm text-muted-foreground">
             Joined {user.createdAt.toLocaleDateString()}
           </p>

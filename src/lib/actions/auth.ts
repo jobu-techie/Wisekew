@@ -5,12 +5,22 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth, signIn } from "@/auth";
 
-const signupSchema = z.object({
-  name: z.string().min(2, "Name is too short"),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["STUDENT", "INSTRUCTOR"]),
-});
+const signupSchema = z
+  .object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email"),
+    confirmEmail: z.string().email("Invalid email"),
+    phone: z.string().min(7, "Enter a valid phone number"),
+    country: z.string().min(1, "Country is required"),
+    postalCode: z.string().min(1, "ZIP/postal code is required"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    role: z.enum(["STUDENT", "INSTRUCTOR"]),
+  })
+  .refine((data) => data.email === data.confirmEmail, {
+    message: "Email addresses do not match",
+    path: ["confirmEmail"],
+  });
 
 export type SignupState = {
   error?: string;
@@ -21,8 +31,13 @@ export async function signupAction(
   formData: FormData,
 ): Promise<SignupState> {
   const parsed = signupSchema.safeParse({
-    name: formData.get("name"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
     email: formData.get("email"),
+    confirmEmail: formData.get("confirmEmail"),
+    phone: formData.get("phone"),
+    country: formData.get("country"),
+    postalCode: formData.get("postalCode"),
     password: formData.get("password"),
     role: formData.get("role"),
   });
@@ -31,7 +46,8 @@ export async function signupAction(
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
-  const { name, email, password, role } = parsed.data;
+  const { firstName, lastName, email, phone, country, postalCode, password, role } = parsed.data;
+  const name = `${firstName} ${lastName}`;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -41,7 +57,7 @@ export async function signupAction(
   const passwordHash = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
-    data: { name, email, passwordHash, role },
+    data: { name, email, phone, country, postalCode, passwordHash, role },
   });
 
   await signIn("credentials", {
