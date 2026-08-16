@@ -45,3 +45,8 @@ next-env.d.ts
 
 # user-uploaded content (local prototype storage)
 /public/uploads
+
+# local AI assistant tooling (dev-server config, cached skill docs)
+/.claude
+/.agents
+/.windsurf
