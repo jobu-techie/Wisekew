@@ -187,20 +187,25 @@ export default async function DashboardPage() {
       ) : (
         <div className="space-y-2">
           {examAttempts.map((a) => (
-            <Card key={a.id}>
-              <CardContent className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-sm">{a.exam.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {a.exam.bank.course.title} ·{" "}
-                    {a.completedAt?.toLocaleDateString()}
-                  </p>
-                </div>
-                <Badge variant={(a.score ?? 0) >= 70 ? "default" : "secondary"}>
-                  {Math.round(a.score ?? 0)}%
-                </Badge>
-              </CardContent>
-            </Card>
+            <Link
+              key={a.id}
+              href={`/courses/${a.exam.bank.course.slug}/exam/${a.examId}/results/${a.id}`}
+            >
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="font-medium text-sm">{a.exam.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {a.exam.bank.course.title} ·{" "}
+                      {a.completedAt?.toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Badge variant={(a.score ?? 0) >= 70 ? "default" : "secondary"}>
+                    {Math.round(a.score ?? 0)}%
+                  </Badge>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
